@@ -1,3 +1,9 @@
-# Requirements for many PaaS (as Heroku)
-
--r requirements/production.txt
+Django
+{% if cookiecutter.postgres == "y" or cookiecutter.postgres == "Y" %}
+psycopg2-binary==2.8.4
+{% endif %}
+{% if cookiecutter.api == "y" or cookiecutter.api == "Y" %}
+djangorestframework
+django-rest-multiple-models
+drf-yasg
+{% endif %}
