@@ -1,4 +1,4 @@
-{   "my_name":"",
+{   
     "author_name": "Your Name",
     "email": "Your Email",
     "year": "{% now 'utc', '%Y' %}",
