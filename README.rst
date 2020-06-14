@@ -12,6 +12,6 @@ First, get cookiecutter::
 
 Now run it against this repo::
 
-    $ cookiecutter https://github.com/ConsoleBit/django-cookiecutter
+    $ cookiecutter https://github.com/rehan4evr/django-cookiecutter
 
 

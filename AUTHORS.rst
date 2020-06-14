@@ -5,4 +5,4 @@ Authors
 Development Lead
 ----------------
 
-* Neeraj Kumar <neeraj@consolebit.com>
+* Aftab Hussain <aftab4evr786@gmail.com>
