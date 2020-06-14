@@ -3,13 +3,18 @@ import uuid
 import pyotp
 import datetime
 
+from twilio.rest import Client
+
+from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
+from django.contrib.auth.models import PermissionsMixin
 from django.db import models
-from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
+from django.conf import settings
+
 
 from rest_framework_jwt.utils import jwt_payload_handler
+
 
 class AbstractTime(models.Model):
     created_at = models.DateTimeField("Created Date", auto_now_add=True)
@@ -113,6 +118,24 @@ class MyUser(AbstractBaseUser, AbstractTime):
         self.otp = otp
         self.save()
         return otp
+
+    def sent_otp(self):
+        try:
+            message = "Thank You! for Signup with FRC. Please use this {} OTP to Verify your mobile number .".format(
+                self.otp
+            )
+            client = Client(
+                settings.TWILIO_ACCOUNT_STD,
+                settings.TWILIO_AUTH_TOKEN
+            )
+            code = self.code.code if self.code else '+91'
+            message = client.messages.create(
+                to=code+self.mobile,
+                from_='+15108170600',
+                body=message
+            )
+        except Exception as e:
+            print("Exception as e", e)
 
     def create_jwt(self):
         """Function for creating JWT for Authentication Purpose"""
