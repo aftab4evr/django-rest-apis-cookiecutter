@@ -44,7 +44,7 @@ INSTALLED_APPS = [
 ]
 
 CUSTOM_APPS = [
-    'user'
+    'auth'
 ]
 
 THIRD_PARTY = [
@@ -121,7 +121,7 @@ DATABASES = {
 }
 
 
-AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = 'auth.User'
 
 
 # Password validation

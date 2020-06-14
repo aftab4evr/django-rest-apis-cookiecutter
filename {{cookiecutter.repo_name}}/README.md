@@ -19,7 +19,7 @@ This is a repository for a {{cookiecutter.description}} developed with Python-Dj
 
 ### Installation
 1. Install [pipenv](https://pypi.org/project/pipenv/)
-2. Clone this repo and `cd BitCoinCore`
+2. Clone this repo and `cd {{cookiecutter.repo_name}}`
 3. Run `pip install --user --upgrade pipenv` to get the latest pipenv version.
 4. Run `pipenv --python 3.8`
 5. Run `pipenv install`
