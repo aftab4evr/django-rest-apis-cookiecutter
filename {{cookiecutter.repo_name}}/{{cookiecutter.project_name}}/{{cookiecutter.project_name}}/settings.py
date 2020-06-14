@@ -48,19 +48,15 @@ CUSTOM_APPS = [
 ]
 
 THIRD_PARTY = [
-    {% if cookiecutter.api == "y" or cookiecutter.api == "Y" %}
     'rest_framework',
     'drf_yasg',
     'corsheaders',
-    {% endif %}
 ]
 
 INSTALLED_APPS += CUSTOM_APPS + THIRD_PARTY
-{% if cookiecutter.api == "y" or cookiecutter.api == "Y" %}
 
 if DEBUG is True:
     CORS_ORIGIN_ALLOW_ALL = True
-{% endif %}
 
 
 CORS_ORIGIN_WHITELIST = [
@@ -142,8 +138,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-
-{% if cookiecutter.api == "y" or cookiecutter.api == "Y" %}
 # Django Rest Framework
 REST_FRAMEWORK = {
     'DATETIME_FORMAT': '%Y-%m-%dT%H:%M:%S%z',
@@ -196,7 +190,6 @@ SWAGGER_SETTINGS = {
         },
     },
 }
-{% endif %}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/

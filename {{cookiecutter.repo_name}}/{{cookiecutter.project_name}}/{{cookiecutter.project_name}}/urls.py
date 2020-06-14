@@ -7,7 +7,6 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django.views.generic.base import TemplateView
 
-{% if cookiecutter.api == "y" or cookiecutter.api == "Y" %}
 schema_view = get_schema_view(
     openapi.Info(
         title="{{ cookiecutter.project_name }} API",
@@ -19,7 +18,6 @@ schema_view = get_schema_view(
     public=True,
     permission_classes=(permissions.AllowAny,),
 )
-{% endif %}
 
 admin.site.site_title = "{{ cookiecutter.project_name|title }} Administration"
 admin.site.site_header = "{{ cookiecutter.project_name|title }} Administration"
@@ -34,20 +32,17 @@ handler404 = '{{ cookiecutter.project_name }}.views.handler404'
 handler500 = '{{ cookiecutter.project_name }}.views.handler500'
 
 if settings.DEBUG:
-    {% if cookiecutter.api == "y" or cookiecutter.api == "Y" %}
     urlpatterns += [
         re_path(r'^swagger(?P<format>\.json|\.yaml)$',
                 schema_view.without_ui(cache_timeout=0), name='schema-json'),
         path('swagger/', schema_view.with_ui('swagger',
-                                              cache_timeout=0), name='schema-swagger-ui'),
+                                             cache_timeout=0), name='schema-swagger-ui'),
         path('redoc/', schema_view.with_ui('redoc',
                                            cache_timeout=0), name='schema-redoc'),
         path('api-auth/', include('rest_framework.urls')),
         path('v1/api/auth/', include('user.urls')),
     ]
-    {% endif %}
     urlpatterns += [
-        # Testing 404 and 500 error pages
         path('404/', TemplateView.as_view(template_name='404.html'), name='404'),
         path('500/', TemplateView.as_view(template_name='500.html'), name='500'),
     ]
