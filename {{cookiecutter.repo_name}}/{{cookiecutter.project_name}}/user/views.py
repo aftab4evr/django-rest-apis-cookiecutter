@@ -14,7 +14,34 @@ from user.models import MyUser
 from user.schema import (
     resend_otp_body, otp_verification_body, change_password_body, login_body
 )
-from user.serializers import(LoginSerializer)
+from user.serializers import(LoginSerializer,SignUpUserSerializer)
+
+
+
+
+class SignUpView(generics.CreateAPIView):
+
+    queryset = MyUser.objects.all()
+    serializer_class = SignUpUserSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            MyUser.objects.get(
+                mobile=request.data['mobile'], is_otp_verify=True)
+            return Response({'response_message': "Mobile no already exist.", }, status=status.HTTP_400_BAD_REQUEST)
+        except MyUser.DoesNotExist:
+            MyUser.objects.filter(mobile=request.data['mobile']).delete()
+
+        try:
+            MyUser.objects.get(
+                email=request.data['email'], is_otp_verify=True)
+            return Response({'response_message': "Email id already exist.", }, status=status.HTTP_400_BAD_REQUEST)
+        except MyUser.DoesNotExist:
+            MyUser.objects.filter(email=request.data['email']).delete()
+
+        instance = super(SignUpView, self).create(request, *args, **kwargs)
+        return Response({'response_message': "Signup successfully", 'data': instance.data}, status=status.HTTP_200_OK)
+
 
 
 class ResentOTPView(APIView):
