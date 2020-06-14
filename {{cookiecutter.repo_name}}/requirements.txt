@@ -1,6 +1,5 @@
 Django
 psycopg2-binary==2.8.4
-{% if cookiecutter.api == "y" or cookiecutter.api == "Y" %}
 djangorestframework==3.10.2
 djangorestframework-jwt==1.11.0
 django-rest-multiple-models
@@ -8,5 +7,4 @@ drf-yasg==1.17.0
 django-cors-headers
 djangorestframework-jwt==1.11.0
 pyotp
-{% endif %}
-django-debug-toolbar
+twilio
