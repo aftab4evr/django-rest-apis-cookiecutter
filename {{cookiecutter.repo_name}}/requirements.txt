@@ -1,7 +1,5 @@
 Django
-{% if cookiecutter.postgres == "y" or cookiecutter.postgres == "Y" %}
 psycopg2-binary==2.8.4
-{% endif %}
 {% if cookiecutter.api == "y" or cookiecutter.api == "Y" %}
 djangorestframework==3.10.2
 djangorestframework-jwt==1.11.0
