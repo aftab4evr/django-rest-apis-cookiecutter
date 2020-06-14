@@ -6,4 +6,6 @@ psycopg2-binary==2.8.4
 djangorestframework
 django-rest-multiple-models
 drf-yasg
+django-cors-headers
 {% endif %}
+django-cors-headers

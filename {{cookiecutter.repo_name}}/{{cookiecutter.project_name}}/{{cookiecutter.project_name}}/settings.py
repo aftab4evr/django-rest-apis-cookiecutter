@@ -55,17 +55,16 @@ THIRD_PARTY = [
     { % endif % }
 ]
 
-# INSTALLED_APPS += CUSTOM_APPS + THIRD_PARTY
+INSTALLED_APPS += CUSTOM_APPS + THIRD_PARTY
+{ % if cookiecutter.api == "y" or cookiecutter.api == "Y" % }
 
 if DEBUG is True:
     CORS_ORIGIN_ALLOW_ALL = True
+{ % endif % }
 
 
 CORS_ORIGIN_WHITELIST = [
-    "http://172.16.6.42:8100",
-    "http://172.16.6.10:8100",
-    "http://192.168.43.169:8100",
-
+    "http:ip:port",
 ]
 
 
@@ -81,7 +80,7 @@ MIDDLEWARE = [
 
 ]
 
-ROOT_URLCONF = 'FrontRowCenter.urls'
+ROOT_URLCONF = '{{ cookiecutter.project_name }}.urls'
 
 TEMPLATES = [
     {
@@ -100,7 +99,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'FrontRowCenter.wsgi.application'
+WSGI_APPLICATION = '{{ cookiecutter.project_name }}.wsgi.application'
 
 
 # Database
