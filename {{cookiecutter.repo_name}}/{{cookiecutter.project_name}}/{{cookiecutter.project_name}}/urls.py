@@ -11,10 +11,10 @@ from django.views.generic.base import TemplateView
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="aftab API",
+        title="{{cookiecutter.project_name}} API",
         default_version='v1',
         description="aftab",
-        contact=openapi.Contact(email="aftab"),
+        contact=openapi.Contact(email="{{cookiecutter.emial}}"),
         license=openapi.License(name="BSD License"),
     ),
     public=True,
@@ -22,8 +22,8 @@ schema_view = get_schema_view(
 )
 
 
-admin.site.site_title = "Aftab Administration"
-admin.site.site_header = "Aftab Administration"
+admin.site.site_title = "{{cookiecutter.project_name}} Administration"
+admin.site.site_header = "{{cookiecutter.project_name}} Administration"
 
 
 urlpatterns = i18n_patterns(

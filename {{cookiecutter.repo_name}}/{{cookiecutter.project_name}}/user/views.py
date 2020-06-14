@@ -99,8 +99,3 @@ class LogoutView(APIView):
         logout(request)
         return Response({"response_message": "Logout Successfully"
         }, status=status.HTTP_200_OK)
-
-
-user = MyUser.objects.get(mobile='7278737088')
-user.is_user_verified = True
-user.save()
