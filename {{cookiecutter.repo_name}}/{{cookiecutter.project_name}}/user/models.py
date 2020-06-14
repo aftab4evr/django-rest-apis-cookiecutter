@@ -3,54 +3,82 @@ from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+    
+{% if cookiecutter.api == "y" or cookiecutter.api == "Y" %}
+from rest_framework_jwt.utils import jwt_payload_handler
+{% endif %}
 
-
-class UserAccountManager(BaseUserManager):
-    def _create_user(self, email, password, **extra_fields):
-        if not email:
-            raise ValueError('The given email must be set')
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save()
-        return user
-
-    def create_user(self, email, password, **extra_fields):
-        extra_fields.setdefault('is_staff', False)
-        extra_fields.setdefault('is_superuser', False)
-        extra_fields.setdefault('is_active', True)
-        return self._create_user(email, password, **extra_fields)
-
-    def create_staff_user(self, email, password, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', False)
-        extra_fields.setdefault('is_active', True)
-        return self._create_user(email, password, **extra_fields)
-
-    def create_superuser(self, email, password, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
-        return self._create_user(email, password, **extra_fields)
-
-
-class User(AbstractBaseUser, PermissionsMixin):
-    first_name = models.CharField(_('First name'), max_length=30, blank=True)
-    last_name = models.CharField(_('Last name'), max_length=30, blank=True)
-    email = models.EmailField(_('Email address'), unique=True)
-    is_staff = models.BooleanField(_('staff status'), default=False,
-                                   help_text=_('Designates whether the user can log into this admin site.'), )
-    is_active = models.BooleanField(_('active'), default=False, help_text=_(
-        'Designates whether this user should be treated as active.'), )
-    date_joined = models.DateTimeField(_('Date joined'), default=timezone.now)
-
-    objects = UserAccountManager()
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+class AbstractTime(models.Model):
+    created_at = models.DateTimeField("Created Date", auto_now_add=True)
+    updated_at = models.DateTimeField("Updated Date", auto_now=True)
 
     class Meta:
-        verbose_name = _('User')
-        verbose_name_plural = _('User')
+        abstract = True
+
+class Country(models.Model):
+    code = models.CharField('Code', max_length=256,)
+    name = models.CharField('Country Name', max_length=256,)
+
+class MyUserMangement(BaseUserManager):
+    def create_user(self, email, username, phone, password):
+        """
+        Creates and saves a User with the given email, date of
+        birth and password.
+        """
+        if not email:
+            raise ValueError('Users must have an Email Address')
+        if not email:
+            raise ValueError('Users must have an Email Address')
+
+        user = self.model(
+            email=self.normalize_email(email),
+            phone=phone,
+            username=username,
+            is_active=False,
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, username, phone, password):
+        user = self.model(
+            email=email,
+            phone=phone,
+            username=username
+        )
+        user.set_password(password)
+        user.is_superuser = True
+        user.user_type = "Super Admin"
+        user.is_active = True
+        user.is_staff = True
+        user.save(using=self._db)
+        return user
+
+class MyUser(AbstractBaseUser, AbstractTime):
+     code = models.ForeignKey(
+        Country, on_delete=models.SET_NULL, null=True, related_name='code')
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    first_name = models.CharField(_('First name'), max_length=50, blank=True)
+    last_name = models.CharField(_('Last name'), max_length=50, blank=True)
+    email = models.EmailField(_('Email address'), null=True, unique=True, blank=True,error_messages={
+                              'unique': "This email id is already registered."})
+    mobile = models.CharField('Mobile Number', max_length=256, null=True, unique=True, blank=True,
+                                error_messages={'unique': "This mobile id is already registered."})
+    image = models.FileField(upload_to='profile/%Y-%M-%d/', null=True, blank=True)
+    otp = models.CharField('OTP', max_length=4, blank=True, null=True)
+    is_staff = models.BooleanField(_('staff status'), default=False,help_text=_('Designates whether the user can log into this admin site.'), )
+    is_active = models.BooleanField(_('active'), default=False, help_text=_('Designates whether this user should be treated as active.'), )
+    is_otp_verify = models.BooleanField("OTP Verify", default=False)
+    is_superuser = models.BooleanField("Super User", default=False)
+
+    objects = MyUserMangement()
+    EMAIL_FIELD = 'email'
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name','mobile']
+
+    class Meta:
+        verbose_name = _('MyUser')
+        verbose_name_plural = _('MyUser')
         ordering = ['-pk']
 
     def __str__(self):
@@ -65,3 +93,20 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.first_name.strip()
+    
+    def otp_creation(self):
+        '''docstring'''
+        totp = pyotp.TOTP("JBSWY3DPEHPK3PXP", digits=4)
+        otp = totp.now()
+        self.otp = otp
+        self.save()
+        return otp
+
+    {% if cookiecutter.api == "y" or cookiecutter.api == "Y" %}
+    def create_jwt(self):
+        """Function for creating JWT for Authentication Purpose"""
+        payload = jwt_payload_handler(self)
+        token = jwt.encode(payload, settings.SECRET_KEY)
+        auth_token = token.decode('unicode_escape')
+        return auth_token
+    {% endif %}
