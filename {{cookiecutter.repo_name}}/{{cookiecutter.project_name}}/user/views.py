@@ -27,7 +27,8 @@ class ResentOTPView(APIView):
             user.sent_otp()
             return Response({'response_message': "OTP verify successfully"}, status=status.HTTP_200_OK)
         except MyUser.DoesNotExist:
-            return Response({'response_message': "This mobile no is not associated with starpath"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'response_message': "This mobile no is not associated with {{cookiecutter.project_name}}"}, 
+            status=status.HTTP_400_BAD_REQUEST)
 
 
 class OTPVerificationView(APIView):
@@ -40,10 +41,13 @@ class OTPVerificationView(APIView):
             if params['otp']:
                 user.is_user_verified = True
                 user.save()
-                return Response({'response_message': "OTP verify successfully"}, status=status.HTTP_200_OK)
-            return Response({'response_message': "Otp miss-match please try again"}, status=status.HTTP_400_BAD_REQUEST)
-        except UserManagement.DoesNotExist:
-            return Response({'response_message': "This mobile no is not associated with starpath"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'response_message': "OTP verify successfully"}, 
+                status=status.HTTP_200_OK)
+            return Response({'response_message': "Otp miss-match please try again"}, 
+            status=status.HTTP_400_BAD_REQUEST)
+        except MyUser.DoesNotExist:
+            return Response({'response_message': "This mobile no is not associated with {{cookiecutter.project_name}}"}, 
+            status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChangePasswordView(APIView):
@@ -55,10 +59,13 @@ class ChangePasswordView(APIView):
             if params['password'] == params['confirm_password']:
                 user.set_password(params['password'])
                 user.save()
-                return Response({'response_message': "Password changed successfully."}, status=status.HTTP_200_OK)
-            return Response({'response_message': "Password and confirm password does't match."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'response_message': "Password changed successfully."}, 
+                status=status.HTTP_200_OK)
+            return Response({'response_message': "Password and confirm password does't match."}, 
+            status=status.HTTP_400_BAD_REQUEST)
         except MyUser.DoesNotExist:
-            return Response({'response_message': "This mobile no is not associated with starpath"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'response_message': "This mobile no is not associated with {{cookiecutter.project_name}}"},
+            status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(APIView):
@@ -71,13 +78,18 @@ class LoginView(APIView):
                 if user.check_password(params['password']):
                     login(request, user)
                     serializer = LoginSerializer(user)
-                    return Response({"response_message": "Login Successfully", "data": serializer.data, "token": user.create_jwt()}, status=status.HTTP_200_OK)
-                return Response({'response_message': "Please enter valid password."}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"response_message": "Login Successfully", 
+                    "data": serializer.data, "token": user.create_jwt()}, 
+                    status=status.HTTP_200_OK)
+                return Response({'response_message': "Please enter valid password."}, 
+                status=status.HTTP_400_BAD_REQUEST)
             user.otp_creation()
             user.sent_otp()
-            return Response({'response_message':  "Please verify your otp first"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'response_message':  "Please verify your otp first"}, 
+            status=status.HTTP_400_BAD_REQUEST)
         except MyUser.DoesNotExist:
-            return Response({'response_message': "This mobile no is not associated with starpath"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'response_message': "This mobile no is not associated with {{cookiecutter.project_name}}"}, 
+            status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutView(APIView):
@@ -85,7 +97,8 @@ class LogoutView(APIView):
 
     def get(self, request):
         logout(request)
-        return Response({"response_message": "Logout Successfully", }, status=status.HTTP_200_OK)
+        return Response({"response_message": "Logout Successfully"
+        }, status=status.HTTP_200_OK)
 
 
 user = MyUser.objects.get(mobile='7278737088')
