@@ -16,7 +16,7 @@ schema_view = get_schema_view(
         contact=openapi.Contact(email="{{ cookiecutter.email }}"),
         license=openapi.License(name="BSD License"),
     ),
-    public=False,
+    public=True,
     permission_classes=(permissions.AllowAny,),
 )
 {% endif %}
@@ -36,14 +36,14 @@ handler500 = '{{ cookiecutter.project_name }}.views.handler500'
 if settings.DEBUG:
     {% if cookiecutter.api == "y" or cookiecutter.api == "Y" %}
     urlpatterns += [
-        re_path(r'^document(?P<format>\.json|\.yaml)$',
+        re_path(r'^swagger(?P<format>\.json|\.yaml)$',
                 schema_view.without_ui(cache_timeout=0), name='schema-json'),
-        path('document/', schema_view.with_ui('swagger',
+        path('swagger/', schema_view.with_ui('swagger',
                                               cache_timeout=0), name='schema-swagger-ui'),
         path('redoc/', schema_view.with_ui('redoc',
                                            cache_timeout=0), name='schema-redoc'),
         path('api-auth/', include('rest_framework.urls')),
-        # include('auth.urls', namespace='auth')),
+        path('v1/api/auth/', include('user.urls')),
     ]
     {% endif %}
     urlpatterns += [
