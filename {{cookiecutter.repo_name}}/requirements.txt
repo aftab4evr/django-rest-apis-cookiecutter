@@ -3,9 +3,10 @@ Django
 psycopg2-binary==2.8.4
 {% endif %}
 {% if cookiecutter.api == "y" or cookiecutter.api == "Y" %}
-djangorestframework
+djangorestframework==3.10.2
+djangorestframework-jwt==1.11.0
 django-rest-multiple-models
-drf-yasg
+drf-yasg==1.17.0
 django-cors-headers
 {% endif %}
-django-cors-headers
+django-debug-toolbar
