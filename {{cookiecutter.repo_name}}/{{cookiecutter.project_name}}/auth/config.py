@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class UserConfig(AppConfig):
-    name = 'user'
+class AuthConfig(AppConfig):
+    name = 'auth'

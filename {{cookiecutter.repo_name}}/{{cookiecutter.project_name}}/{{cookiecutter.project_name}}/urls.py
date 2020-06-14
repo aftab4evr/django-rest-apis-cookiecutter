@@ -43,7 +43,7 @@ if settings.DEBUG:
 		path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 		path('api-auth/', include('rest_framework.urls')),
     	path('v1/api/auth/',
-        include('auth.urls', namespace='auth')),
+        # include('auth.urls', namespace='auth')),
 	]
 	{% endif %}
 	urlpatterns += [
