@@ -56,7 +56,7 @@ class MyUserMangement(BaseUserManager):
 
 class MyUser(AbstractBaseUser, AbstractTime):
      code = models.ForeignKey(
-        Country, on_delete=models.SET_NULL, null=True, related_name='code')
+        Country, on_delete=models.SET_NULL, null=True, related_name='country_code')
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     first_name = models.CharField(_('First name'), max_length=50, blank=True)
     last_name = models.CharField(_('Last name'), max_length=50, blank=True)
