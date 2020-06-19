@@ -10,38 +10,35 @@ from django.contrib.auth import login, logout, authenticate
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
-from user.models import MyUser
+from user.models import Account
 from user.schema import (
     resend_otp_body, otp_verification_body, change_password_body, login_body
 )
-from user.serializers import(LoginSerializer,SignUpUserSerializer)
-
-
+from user.serializers import(LoginSerializer, SignUpUserSerializer)
 
 
 class SignUpView(generics.CreateAPIView):
 
-    queryset = MyUser.objects.all()
+    queryset = Account.objects.all()
     serializer_class = SignUpUserSerializer
 
     def create(self, request, *args, **kwargs):
         try:
-            MyUser.objects.get(
+            Account.objects.get(
                 mobile=request.data['mobile'], is_otp_verify=True)
             return Response({'response_message': "Mobile no already exist.", }, status=status.HTTP_400_BAD_REQUEST)
-        except MyUser.DoesNotExist:
-            MyUser.objects.filter(mobile=request.data['mobile']).delete()
+        except Account.DoesNotExist:
+            Account.objects.filter(mobile=request.data['mobile']).delete()
 
         try:
-            MyUser.objects.get(
+            Account.objects.get(
                 email=request.data['email'], is_otp_verify=True)
             return Response({'response_message': "Email id already exist.", }, status=status.HTTP_400_BAD_REQUEST)
-        except MyUser.DoesNotExist:
-            MyUser.objects.filter(email=request.data['email']).delete()
+        except Account.DoesNotExist:
+            Account.objects.filter(email=request.data['email']).delete()
 
         instance = super(SignUpView, self).create(request, *args, **kwargs)
         return Response({'response_message': "Signup successfully", 'data': instance.data}, status=status.HTTP_200_OK)
-
 
 
 class ResentOTPView(APIView):
@@ -49,13 +46,13 @@ class ResentOTPView(APIView):
     def post(self, request):
         params = request.data
         try:
-            user = MyUser.objects.get(mobile=params['mobile'])
+            user = Account.objects.get(mobile=params['mobile'])
             user.otp_creation()
             user.sent_otp()
             return Response({'response_message': "OTP verify successfully"}, status=status.HTTP_200_OK)
-        except MyUser.DoesNotExist:
-            return Response({'response_message': "This mobile no is not associated with {{cookiecutter.project_name}}"}, 
-            status=status.HTTP_400_BAD_REQUEST)
+        except Account.DoesNotExist:
+            return Response({'response_message': "This mobile no is not associated with {{cookiecutter.project_name}}"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class OTPVerificationView(APIView):
@@ -63,18 +60,18 @@ class OTPVerificationView(APIView):
     def post(self, request):
         params = request.data
         try:
-            user = MyUser.objects.get(mobile=params['mobile'])
+            user = Account.objects.get(mobile=params['mobile'])
             # if user.otp == params['otp']:
             if params['otp']:
                 user.is_user_verified = True
                 user.save()
-                return Response({'response_message': "OTP verify successfully"}, 
-                status=status.HTTP_200_OK)
-            return Response({'response_message': "Otp miss-match please try again"}, 
-            status=status.HTTP_400_BAD_REQUEST)
-        except MyUser.DoesNotExist:
-            return Response({'response_message': "This mobile no is not associated with {{cookiecutter.project_name}}"}, 
-            status=status.HTTP_400_BAD_REQUEST)
+                return Response({'response_message': "OTP verify successfully"},
+                                status=status.HTTP_200_OK)
+            return Response({'response_message': "Otp miss-match please try again"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Account.DoesNotExist:
+            return Response({'response_message': "This mobile no is not associated with {{cookiecutter.project_name}}"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChangePasswordView(APIView):
@@ -82,17 +79,17 @@ class ChangePasswordView(APIView):
     def post(self, request):
         params = request.data
         try:
-            user = MyUser.objects.get(mobile=params['mobile'])
+            user = Account.objects.get(mobile=params['mobile'])
             if params['password'] == params['confirm_password']:
                 user.set_password(params['password'])
                 user.save()
-                return Response({'response_message': "Password changed successfully."}, 
-                status=status.HTTP_200_OK)
-            return Response({'response_message': "Password and confirm password does't match."}, 
-            status=status.HTTP_400_BAD_REQUEST)
-        except MyUser.DoesNotExist:
+                return Response({'response_message': "Password changed successfully."},
+                                status=status.HTTP_200_OK)
+            return Response({'response_message': "Password and confirm password does't match."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Account.DoesNotExist:
             return Response({'response_message': "This mobile no is not associated with {{cookiecutter.project_name}}"},
-            status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(APIView):
@@ -100,23 +97,23 @@ class LoginView(APIView):
     def post(self, request):
         params = request.data
         try:
-            user = MyUser.objects.get(mobile=params['mobile'])
+            user = Account.objects.get(mobile=params['mobile'])
             if user.is_user_verified:
                 if user.check_password(params['password']):
                     login(request, user)
                     serializer = LoginSerializer(user)
-                    return Response({"response_message": "Login Successfully", 
-                    "data": serializer.data, "token": user.create_jwt()}, 
-                    status=status.HTTP_200_OK)
-                return Response({'response_message': "Please enter valid password."}, 
-                status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"response_message": "Login Successfully",
+                                     "data": serializer.data, "token": user.create_jwt()},
+                                    status=status.HTTP_200_OK)
+                return Response({'response_message': "Please enter valid password."},
+                                status=status.HTTP_400_BAD_REQUEST)
             user.otp_creation()
             user.sent_otp()
-            return Response({'response_message':  "Please verify your otp first"}, 
-            status=status.HTTP_400_BAD_REQUEST)
-        except MyUser.DoesNotExist:
-            return Response({'response_message': "This mobile no is not associated with {{cookiecutter.project_name}}"}, 
-            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'response_message':  "Please verify your otp first"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Account.DoesNotExist:
+            return Response({'response_message': "This mobile no is not associated with {{cookiecutter.project_name}}"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutView(APIView):
@@ -125,4 +122,4 @@ class LogoutView(APIView):
     def get(self, request):
         logout(request)
         return Response({"response_message": "Logout Successfully"
-        }, status=status.HTTP_200_OK)
+                         }, status=status.HTTP_200_OK)

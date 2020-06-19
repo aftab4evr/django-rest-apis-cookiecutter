@@ -116,7 +116,7 @@ DATABASES = {
 }
 
 
-AUTH_USER_MODEL = 'user.MyUser'
+AUTH_USER_MODEL = 'user.Account'
 
 
 # Password validation

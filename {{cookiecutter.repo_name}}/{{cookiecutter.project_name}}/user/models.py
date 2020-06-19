@@ -29,7 +29,7 @@ class Country(models.Model):
     name = models.CharField('Country Name', max_length=256,)
 
 
-class MyUserMangement(BaseUserManager):
+class AccountMangement(BaseUserManager):
     def create_user(self, email, mobile, password, first_name, last_name):
         """
         Creates and saves a User with the given email, date of
@@ -67,12 +67,11 @@ class MyUserMangement(BaseUserManager):
         return user
 
 
-class MyUser(AbstractBaseUser, AbstractTime):
+class Account(AbstractBaseUser, AbstractTime):
     code = models.ForeignKey(
         Country, on_delete=models.SET_NULL, null=True, related_name='country_code')
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
-    first_name = models.CharField(_('First name'), max_length=50, blank=True)
-    last_name = models.CharField(_('Last name'), max_length=50, blank=True)
+
     email = models.EmailField(_('Email address'), null=True, unique=True, blank=True, error_messages={
                               'unique': "This email id is already registered."})
     mobile = models.CharField('Mobile Number', max_length=256, null=True, unique=True, blank=True,
@@ -88,14 +87,14 @@ class MyUser(AbstractBaseUser, AbstractTime):
     is_superuser = models.BooleanField("Super User", default=False)
     is_user_verified = models.BooleanField(default=False)
 
-    objects = MyUserMangement()
+    objects = AccountMangement()
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'mobile']
 
     class Meta:
-        verbose_name = _('MyUser')
-        verbose_name_plural = _('MyUser')
+        verbose_name = _('Account')
+        verbose_name_plural = _('Account')
         ordering = ['-pk']
 
     def __str__(self):
@@ -121,7 +120,7 @@ class MyUser(AbstractBaseUser, AbstractTime):
 
     def sent_otp(self):
         try:
-            message = "Thank You! for Signup with FRC. Please use this {} OTP to Verify your mobile number .".format(
+            message = "Thank You! for Signup with {{}}. Please use this {} OTP to Verify your mobile number .".format(
                 self.otp
             )
             client = Client(
@@ -143,3 +142,10 @@ class MyUser(AbstractBaseUser, AbstractTime):
         token = jwt.encode(payload, settings.SECRET_KEY)
         auth_token = token.decode('unicode_escape')
         return auth_token
+
+
+class UserManagement(AbstractTime):
+    user = models.OneToOneField(
+        Account, on_delete=models.SET_NULL, null=True, related_name='user')
+    first_name = models.CharField(_('First name'), max_length=50, blank=True)
+    last_name = models.CharField(_('Last name'), max_length=50, blank=True)

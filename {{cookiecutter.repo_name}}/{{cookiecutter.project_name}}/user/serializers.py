@@ -1,12 +1,12 @@
 from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
 
-from .models import MyUser
+from .models import Account
 
 
 class SignUpUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
-        instance = MyUser.objects.create(**validated_data)
+        instance = Account.objects.create(**validated_data)
         instance.set_password(validated_data['password'])
         instance.save()
         instance.otp_creation()
@@ -14,7 +14,7 @@ class SignUpUserSerializer(serializers.ModelSerializer):
         return instance
 
     class Meta:
-        model = MyUser
+        model = Account
         fields = ("password", "last_name", "first_name",
                   "email", "mobile", "code")
 
@@ -35,6 +35,6 @@ class LoginSerializer(serializers.ModelSerializer):
         return None
 
     class Meta:
-        model = MyUser
+        model = Account
         fields = ("uuid", "image", "first_name",
                   "last_name", "email", "mobile", "code")

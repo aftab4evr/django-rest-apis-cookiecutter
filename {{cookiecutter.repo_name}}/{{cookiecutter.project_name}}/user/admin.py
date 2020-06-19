@@ -1,13 +1,13 @@
 from django.contrib import admin
 
-from user.models import MyUser
+from user.models import Account
 
-class MyUserAdmin(admin.ModelAdmin):
+class AccountAdmin(admin.ModelAdmin):
     """
-        MyUser Model admin with display liast,link,read only feilds and search option.
+        Account Model admin with display liast,link,read only feilds and search option.
     """
     icon = '<i class="material-icons">account_circle</i>'
     list_display = ['id', 'is_active', 'mobile', 'email', 'uuid']
 
 
-admin.site.register(MyUser, MyUserAdmin)
+admin.site.register(Account, AccountAdmin)
